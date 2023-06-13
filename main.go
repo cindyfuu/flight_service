@@ -1,6 +1,10 @@
 package main
 
-// use for Sizeof
+import (
+	_ "fmt"
+	_ "time"
+	_ "unsafe" // use for Sizeof
+)
 
 type person struct {
 	husky_id   string
