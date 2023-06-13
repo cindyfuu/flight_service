@@ -8,11 +8,11 @@ import (
 
 type person struct {
 	husky_id   string
-	Form_id    int
+	form_id    int
 	name       string
-	Email      string
-	Arr_date   string
-	Arr_time   string
+	email      string
+	arr_date   string
+	arr_time   string
 	flight_num string
 }
 
@@ -21,3 +21,5 @@ type ride struct {
 	time   string
 	people []person
 }
+
+func main() {}
