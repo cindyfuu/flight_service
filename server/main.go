@@ -29,13 +29,13 @@ func main() {
 	// store information of all people from CSV
 	people := readCSV()
 	fmt.Println(people)
-	rides := calc(people)
+	//rides := calc(people)
 }
 
 func readCSV() []Person {
 	people := []Person{}
 	// Open the file
-	csvfile, err := os.Open("../flight_info.csv")
+	csvfile, err := os.Open("../flight_info_clean.csv")
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
@@ -72,20 +72,21 @@ func readCSV() []Person {
 }
 
 //calculate the 30minute time frame that has the most people landed on all days
-//return the ride informationi that include the date, the time frame, and the 
+//return the ride informationi that include the date, the time frame, and the
 //people on that ride
-func calc(people []Person) []Ride {
+/*func calc(people []Person) []Ride {
 	allRides := []Ride{}
 	for _ , v range people {
 		switch v.arr_date {
 		case "9月19日":
-			
+
 		case "9月20日":
 
 		case "9月21日":
-			
+
 		}
 	}
 //
 	retrun allRides
 }
+*/
