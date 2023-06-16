@@ -39,6 +39,7 @@ func main() {
 	rides := calc(people, "9月20日")
 }
 
+// read flight_info_clean.csv into a slice of person struct 
 func readCSV() []Person {
 	people := []Person{}
 	// Open the file
@@ -83,6 +84,7 @@ func readCSV() []Person {
 //people on that ride
 func calc(people []Person, date string) []Ride {
 	allRides := []Ride{}
+	//create a map which key is the arr_time and value is the slice of person 
 	groupByArrTime := make(map[string][]Person)
 	for _ , v range people {
 		if v.arr_date == date {
