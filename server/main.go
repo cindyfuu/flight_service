@@ -29,7 +29,8 @@ type Ride struct {
 }
 
 var ride_per_day = 2
-var people_per_ride = 46
+var timeFrameInMin = 30
+//var people_per_ride = 46
 
 func main() {
 	// store information of all people from CSV
@@ -94,11 +95,36 @@ func calc(people []Person, date string) []Ride {
 			}
 		}
 	}
+	//value of keys are strings
 	keys := reflect.ValueOf(groupByArrTime).MapKeys()
-    fmt.Println(keys) 
-	sort.Slice(keys, func(i, j int) bool {return convertToDatetime(date, keys[i]).Before(convertToDatetime(date, keys[j]))})
-	fmt.Println("sorted keys:", keys)
-	for i := 1; i < len(keys)
+	fmt.Println(keys) 
+	keysInTime := []int{}
+	for i := 0; i < len(keys); i++ {
+		keysInTime[i] = convertToDatetime(date, keys[i])
+	}
+	sort.Slice(keysInTime, func(i, j int) bool {return keysInTime[i].Before(keysInTime[j])})
+	fmt.Println("sorted keys:", keysInTime)
+	pplperT = []int{}
+	for i := 0; i < len(keys); i++ {
+		num := 0
+		start := keysInTime[i]
+		end := keysInTime[i].Add(timeFrameInMin*time.Minute)
+		for j := i; j < len(keys); j++ {
+			if keysInTime[j].Before(end) {
+				num += len(groupByArrTime[[j]])
+			}
+		}
+		pplPerT[i] = num
+	}
+	maxV := 0
+	maxIndex := 0
+	// need to consider this scenario: [1 3 4 7 7 5]
+	for index, value := range pplPerT {
+		if value > maxV {
+			maxV = value
+			maxIndex = index
+		}
+	}
 	retrun allRides
 }
 
@@ -119,7 +145,7 @@ func convertToDatetime(date string, time string) {
 	return time.Date(2023, monthInt, dayInt, timeInt[0], timeInt[1], 0, 100, time.Local)
 }
 
-func subtractTime(time1, time2 time.Time) float64 {
+/*func subtractTime(time1, time2 time.Time) float64 {
 	diff := time2.Sub(time1).Minutes()
 	return diff
-}
+}*/
