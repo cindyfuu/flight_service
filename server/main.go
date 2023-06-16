@@ -6,7 +6,10 @@ import (
 	"io"
 	"log"
 	"os"
-	_ "time"
+	"time"
+	"strings"
+	"strconv"
+	"reflect"
 	_ "unsafe" // use for Sizeof
 )
 
@@ -25,11 +28,14 @@ type Ride struct {
 	peoplePerRide []Person
 }
 
+var ride_per_day = 2
+var people_per_ride = 46
+
 func main() {
 	// store information of all people from CSV
 	people := readCSV()
 	fmt.Println(people)
-	//rides := calc(people)
+	rides := calc(people, "9月20日")
 }
 
 func readCSV() []Person {
@@ -71,22 +77,49 @@ func readCSV() []Person {
 	return people
 }
 
-//calculate the 30minute time frame that has the most people landed on all days
+//calculate the 30minute time frame that has the most people landed on one day
 //return the ride informationi that include the date, the time frame, and the
 //people on that ride
-/*func calc(people []Person) []Ride {
+func calc(people []Person, date string) []Ride {
 	allRides := []Ride{}
+	groupByArrTime := make(map[string][]Person)
 	for _ , v range people {
-		switch v.arr_date {
-		case "9月19日":
-
-		case "9月20日":
-
-		case "9月21日":
-
+		if v.arr_date == date {
+			arrT = v.arr_time
+			value, ok := groupByArrTime[arrT]
+			if ok == true {
+				groupByArrTime[arrT] = append(groupByArrTime[arrT], v)
+			} else {
+				pplLanded := []Person{v}
+			}
 		}
 	}
-//
+	keys := reflect.ValueOf(groupByArrTime).MapKeys()
+    fmt.Println(keys) 
+	sort.Slice(keys, func(i, j int) bool {return convertToDatetime(date, keys[i]).Before(convertToDatetime(date, keys[j]))})
+	fmt.Println("sorted keys:", keys)
+	for i := 1; i < len(keys)
 	retrun allRides
 }
-*/
+
+func convertToDatetime(date string, time string) {
+	date := strings.Split(date, "月")
+	day := strings.Trim(date[1], "日")
+	monthInt, err := strconv.Atoi(date[0])
+	fmt.Println(monthInt, err, reflect.TypeOf(monthInt))
+	dayInt, err := strconv.Atoi(day)
+	fmt.Println(dayInt, err, reflect.TypeOf(dayInt))
+
+	time := strings.Split(time, ":")
+	timeInt = []int{}
+	for i := 0; i < 2; i++ {
+		res, err := strconv.Atoi(time[i])
+		timeInt = append(timeInt, res)
+	}
+	return time.Date(2023, monthInt, dayInt, timeInt[0], timeInt[1], 0, 100, time.Local)
+}
+
+func subtractTime(time1, time2 time.Time) float64 {
+	diff := time2.Sub(time1).Minutes()
+	return diff
+}
