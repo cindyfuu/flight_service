@@ -30,7 +30,7 @@ type Ride struct {
 	peoplePerRide []Person
 }
 
-// para struct to store information about parameters
+// para struct to store information about parameters passed in from client side
 type para struct {
 	ride_per_day      int
 	time_frame_in_min int
