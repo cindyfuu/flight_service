@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -37,6 +36,15 @@ type Ride struct {
 	count         int
 }
 
+// Ride struct to store information about a ride
+type RideFinal struct {
+	date          string
+	start         string
+	end           string
+	peoplePerRide [][]Person
+	count         int
+}
+
 // request struct to store information about parameters passed in from client side
 type request struct {
 	ride_per_day      int
@@ -47,7 +55,7 @@ type request struct {
 }
 
 type Response struct {
-	topNumberRides []Ride
+	topNumberRides []RideFinal
 }
 
 // Pair struct will hold a key-value pair
@@ -66,13 +74,16 @@ func main() {
 		ride_per_day:      2,
 		time_frame_in_min: 30,
 		people:            people,
-		date:              "9月20日",
+		date:              "09/20",
 	}
 	allRides := calc(&requestInfo)
+	//fmt.Println(allRides)
 	final := Response{
 		topNumberRides: getTopRides(allRides, requestInfo.ride_per_day),
 	}
-	fmt.Println(final)
+	fmt.Println(final.topNumberRides[0])
+	fmt.Println()
+	fmt.Println(final.topNumberRides[1])
 }
 
 // readCSV reads flight_info_clean.csv into a slice of person struct
@@ -106,6 +117,7 @@ func readCSV() []Person {
 			people = append(people, personInfo)
 		}
 	}
+	//fmt.Println(people)
 	return people
 }
 
@@ -125,11 +137,13 @@ func calc(info *request) []Ride {
 			}
 		}
 	}
+	//fmt.Println(groupByArrTime)
 	// keys is a slice of string where value are the keys of groupByArrTime
-	keys := make([]string, len(groupByArrTime))
+	keys := []string{}
 	for k := range groupByArrTime {
 		keys = append(keys, k)
 	}
+	//fmt.Println(keys, len(keys))
 	// keysInTime is a slice of time.Time where value are the time.Time type of keys slice
 	keysInTime := []time.Time{}
 	for i := 0; i < len(keys); i++ {
@@ -137,7 +151,6 @@ func calc(info *request) []Ride {
 	}
 	//sort keysInTime in ascending order
 	sort.Slice(keysInTime, func(i, j int) bool { return keysInTime[i].Before(keysInTime[j]) })
-	fmt.Println("sorted keys:", keysInTime)
 	//try to calculate number of people landed for each 30mintue time frame
 	//groupByArrTimeInTime is the same map as groupByArrTime except the keys are in time.Time
 	groupByArrTimeInTime := make(map[time.Time][]Person)
@@ -145,6 +158,7 @@ func calc(info *request) []Ride {
 		newKey := convertToDatetime(info.date, key)
 		groupByArrTimeInTime[newKey] = value
 	}
+	//fmt.Println(groupByArrTimeInTime)
 	allRides := calcTimeInter(keysInTime, info, groupByArrTimeInTime)
 	return allRides
 }
@@ -155,7 +169,7 @@ func calcTimeInter(keys []time.Time, info *request, groupByArrTime map[time.Time
 	end := 0
 	temp := [][]Person{}
 	count := 0
-	for start == end && start == len(keys)-1 {
+	for !(start == end && start == len(keys)-1) {
 		ifIn30Min := keys[start].Add(time.Duration(info.time_frame_in_min) * time.Minute).After(keys[end])
 		if keys[start].Equal(keys[end]) {
 			end++
@@ -166,6 +180,8 @@ func calcTimeInter(keys []time.Time, info *request, groupByArrTime map[time.Time
 			}
 			temp = append(temp, groupByArrTime[keys[end]])
 			count = count + len(groupByArrTime[keys[end]])
+			fmt.Println(keys[start])
+			fmt.Println(keys[end])
 			ride := Ride{
 				date:          info.date,
 				start:         keys[start],
@@ -186,13 +202,10 @@ func calcTimeInter(keys []time.Time, info *request, groupByArrTime map[time.Time
 }
 
 // convertToDatetime converts the date and time strings to a time.Time object
-// TODO: change the split 月 & 日
 func convertToDatetime(date string, exactTime string) time.Time {
 	dateSlice := strings.Split(date, "/")
-	monthInt, err := strconv.Atoi(dateSlice[0])
-	fmt.Println(monthInt, err, reflect.TypeOf(monthInt))
-	dayInt, err := strconv.Atoi(dateSlice[1])
-	fmt.Println(dayInt, err, reflect.TypeOf(dayInt))
+	monthInt, _ := strconv.Atoi(dateSlice[0])
+	dayInt, _ := strconv.Atoi(dateSlice[1])
 
 	timeSlice := strings.Split(exactTime, ":")
 	timeInt := []int{}
@@ -229,7 +242,7 @@ func latestNonConflict(arr []Ride, i int) int {
 }
 
 // getTopRides returns the top k rides that have the most people and that do not overlap in time
-func getTopRides(allRides []Ride, num int) []Ride {
+func getTopRides(allRides []Ride, num int) []RideFinal {
 	// Sort rides according to start time
 	sort.Slice(allRides, func(i, j int) bool { return allRides[i].start.Before(allRides[j].start) })
 
@@ -255,14 +268,21 @@ func getTopRides(allRides []Ride, num int) []Ride {
 	maxCount := table[n-1]
 
 	// Initialize result
-	res := make([]Ride, 0, num)
+	res := make([]RideFinal, 0, num)
 
 	// Traverse through table[] to find out which rides are included in result
 	for i := n - 1; i >= 0; i-- {
 		// If this ride is included
 		if (i == 0 && maxCount > 0) || maxCount != table[i-1] {
+			ride := RideFinal{
+				date:          allRides[i].date,
+				start:         allRides[i].start.Format("01/02/2006 15:04"),
+				end:           allRides[i].end.Format("01/02/2006 15:04"),
+				peoplePerRide: allRides[i].peoplePerRide,
+				count:         allRides[i].count,
+			}
 			// This ride is included in result
-			res = append(res, allRides[i])
+			res = append(res, ride)
 			// Since this ride is included its count should be subtracted
 			maxCount -= allRides[i].count
 			if len(res) == num {
