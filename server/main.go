@@ -36,7 +36,7 @@ type Ride struct {
 	count         int
 }
 
-// Ride struct to store information about a ride
+// Slightly moderated ride struct that the start and end field are in string which is more readable than time.Time
 type RideFinal struct {
 	date          string
 	start         string
@@ -46,14 +46,14 @@ type RideFinal struct {
 }
 
 // request struct to store information about parameters passed in from client side
-type request struct {
+type Request struct {
 	ride_per_day      int
 	time_frame_in_min int
-	//people_per_ride int
-	people []Person
-	date   string
+	people            []Person
+	date              string
 }
 
+// Response struct to store all information returning to client
 type Response struct {
 	topNumberRides []RideFinal
 }
@@ -70,14 +70,13 @@ type RidePairList []RidePair
 func main() {
 	// store information of all people from CSV
 	people := readCSV()
-	requestInfo := request{
+	requestInfo := Request{
 		ride_per_day:      2,
 		time_frame_in_min: 30,
 		people:            people,
 		date:              "09/20",
 	}
 	allRides := calc(&requestInfo)
-	//fmt.Println(allRides)
 	final := Response{
 		topNumberRides: getTopRides(allRides, requestInfo.ride_per_day),
 	}
@@ -117,13 +116,13 @@ func readCSV() []Person {
 			people = append(people, personInfo)
 		}
 	}
-	//fmt.Println(people)
 	return people
 }
 
-// calc calculates the 30-minute time frame that has the most people landed on one day
-// It returns the ride information that includes the date, the time frame, and the people on that ride
-func calc(info *request) []Ride {
+// calc function calculates all possible 30 min time frame ride
+// Para: info - request from client
+// Return: a slice of ride struct that include all possible ride
+func calc(info *Request) []Ride {
 	// create a map which key is the arr_time and value is the slice of person
 	groupByArrTime := make(map[string][]Person)
 	for _, v := range info.people {
@@ -137,13 +136,11 @@ func calc(info *request) []Ride {
 			}
 		}
 	}
-	//fmt.Println(groupByArrTime)
 	// keys is a slice of string where value are the keys of groupByArrTime
 	keys := []string{}
 	for k := range groupByArrTime {
 		keys = append(keys, k)
 	}
-	//fmt.Println(keys, len(keys))
 	// keysInTime is a slice of time.Time where value are the time.Time type of keys slice
 	keysInTime := []time.Time{}
 	for i := 0; i < len(keys); i++ {
@@ -158,12 +155,18 @@ func calc(info *request) []Ride {
 		newKey := convertToDatetime(info.date, key)
 		groupByArrTimeInTime[newKey] = value
 	}
-	//fmt.Println(groupByArrTimeInTime)
 	allRides := calcTimeInter(keysInTime, info, groupByArrTimeInTime)
 	return allRides
 }
 
-func calcTimeInter(keys []time.Time, info *request, groupByArrTime map[time.Time][]Person) []Ride {
+// calculate all possible 30 min rides
+// para: keys - arrival time in time.Time type
+//
+//	info - request info from client
+//	groupByArrTime - record all arrrival time in time.Time and its respectively people landing at that time
+//
+// return: all possible rides in the time frame
+func calcTimeInter(keys []time.Time, info *Request, groupByArrTime map[time.Time][]Person) []Ride {
 	allRides := []Ride{}
 	start := 0
 	end := 0
