@@ -60,6 +60,7 @@ type RidePairList []RidePair
 
 func main() {
 	// store information of all people from CSV
+	// TODO： change the date
 	people := readCSV()
 	requestInfo := request{
 		ride_per_day:      2,
@@ -100,7 +101,7 @@ func getTopRides(allRides []Ride, num int) []Ride {
 func readCSV() []Person {
 	people := []Person{}
 	// Open the file
-	csvfile, err := os.Open("../flight_info_clean.csv")
+	csvfile, err := os.Open("../flight_info_new.csv")
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
@@ -199,6 +200,7 @@ func calculateTimeInterval(start int, end int, keys []time.Time, groupByArrTime 
 }*/
 
 // convertToDatetime converts the date and time strings to a time.Time object
+// TODO: change the split 月 & 日
 func convertToDatetime(date string, exactTime string) time.Time {
 	dateSlice := strings.Split(date, "月")
 	day := strings.Trim(dateSlice[1], "日")
