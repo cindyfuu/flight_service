@@ -1,5 +1,10 @@
 package main
 
+/*calcTimeInterval: delete function and replace it with a forloop with start keep adding
+  getTopRides: filter time
+  Test: go test
+  make sure all funciton has comment  */
+
 import (
 	"encoding/csv"
 	"fmt"
@@ -142,28 +147,32 @@ func calc(info *request) []Ride {
 			}
 		}
 	}
-	// value of keys are strings
+	// keys is a slice of string where value are the keys of groupByArrTime
 	keys := make([]string, len(groupByArrTime))
 	for k := range groupByArrTime {
 		keys = append(keys, k)
 	}
-	fmt.Println("keys:", keys)
+	// keysInTime is a slice of time.Time where value are the time.Time type of keys slice
 	keysInTime := []time.Time{}
 	for i := 0; i < len(keys); i++ {
 		keysInTime[i] = convertToDatetime(info.date, keys[i])
 	}
+	//sort keysInTime in ascending order
 	sort.Slice(keysInTime, func(i, j int) bool { return keysInTime[i].Before(keysInTime[j]) })
 	fmt.Println("sorted keys:", keysInTime)
 	//try to calculate number of people landed for each 30mintue time frame
+	//groupByArrTimeInTime is the same map as groupByArrTime except the keys are in time.Time
 	groupByArrTimeInTime := make(map[time.Time][]Person)
 	for key, value := range groupByArrTime {
 		newKey := convertToDatetime(info.date, key)
 		groupByArrTimeInTime[newKey] = value
 	}
-	allRides = calculateTimeInterval(0, 1, keysInTime, groupByArrTimeInTime, allRides, info.time_frame_in_min)
+	//allRides = calculateTimeInterval(0, 1, keysInTime, groupByArrTimeInTime, allRides, info.time_frame_in_min)
+
 	return allRides
 }
 
+/*
 func calculateTimeInterval(start int, end int, keys []time.Time, groupByArrTime map[time.Time][]Person, allRides []Ride, timeFrame int) []Ride {
 	if start == len(keys) || end == len(keys) {
 		return allRides
@@ -176,12 +185,18 @@ func calculateTimeInterval(start int, end int, keys []time.Time, groupByArrTime 
 		for i := start + 1; i <= end; i++ {
 			temp = append(temp, groupByArrTime[keys[i]]...)
 		}
+		ride := Ride{
+			date:
+			start:
+			end:
+			peoplePerRide: temp
+		}
 		allRides = calculateTimeInterval(start, end+1, keys, groupByArrTime, allRides, timeFrame)
 	} else {
 		allRides = calculateTimeInterval(start+1, end, keys, groupByArrTime, allRides, timeFrame)
 	}
 	return allRides
-}
+}*/
 
 // convertToDatetime converts the date and time strings to a time.Time object
 func convertToDatetime(date string, exactTime string) time.Time {
