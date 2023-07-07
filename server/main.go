@@ -202,11 +202,10 @@ func calculateTimeInterval(start int, end int, keys []time.Time, groupByArrTime 
 // convertToDatetime converts the date and time strings to a time.Time object
 // TODO: change the split 月 & 日
 func convertToDatetime(date string, exactTime string) time.Time {
-	dateSlice := strings.Split(date, "月")
-	day := strings.Trim(dateSlice[1], "日")
+	dateSlice := strings.Split(date, "/")
 	monthInt, err := strconv.Atoi(dateSlice[0])
 	fmt.Println(monthInt, err, reflect.TypeOf(monthInt))
-	dayInt, err := strconv.Atoi(day)
+	dayInt, err := strconv.Atoi(dateSlice[1])
 	fmt.Println(dayInt, err, reflect.TypeOf(dayInt))
 
 	timeSlice := strings.Split(exactTime, ":")
