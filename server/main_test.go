@@ -21,14 +21,14 @@ func TestGetTopRidesOverlapped(t *testing.T) {
 			start:         start1,
 			end:           end1,
 			peoplePerRide: nil,
-			count:         10,
+			count:         9,
 		},
 		{
 			date:          "09/20",
 			start:         start2,
 			end:           end2,
 			peoplePerRide: nil,
-			count:         9,
+			count:        10,
 		},
 		{
 			date:          "09/20",

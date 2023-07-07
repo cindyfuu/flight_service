@@ -241,7 +241,6 @@ func latestNonConflict(arr []Ride, i int) int {
 
 // getTopRides returns the top k rides that have the most people and that do not overlap in time
 func getTopRides(allRides []Ride, num int) []RideFinal {
-	// Sort rides according to start time
 	sort.Slice(allRides, func(i, j int) bool { return allRides[i].start.Before(allRides[j].start) })
 
 	// Create an array to store solutions of subproblems. table[i] stores the maximum people count ending at arr[i]
@@ -279,7 +278,6 @@ func getTopRides(allRides []Ride, num int) []RideFinal {
 				peoplePerRide: allRides[i].peoplePerRide,
 				count:         allRides[i].count,
 			}
-			// This ride is included in result
 			res = append(res, ride)
 			// Since this ride is included its count should be subtracted
 			maxCount -= allRides[i].count
