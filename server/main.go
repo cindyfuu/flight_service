@@ -1,10 +1,5 @@
 package main
 
-/*calcTimeInterval: delete function and replace it with a forloop with start keep adding
-  getTopRides: filter time
-  Test: go test
-  make sure all funciton has comment  */
-
 import (
 	"encoding/csv"
 	"fmt"
